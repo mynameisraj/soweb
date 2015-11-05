@@ -20,3 +20,6 @@ def index():
 #rest endpoints
 from endpoints.example import Example
 api.add_resource(Example, "/example")
+
+from endpoints.auth import Auth
+api.add_resource(Auth, "/auth")

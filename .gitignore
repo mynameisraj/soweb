@@ -1,3 +1,4 @@
 *.pyc
 *.swp
 .DS_Store
+soweb/endpoints/real_config.py
