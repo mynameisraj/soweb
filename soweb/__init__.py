@@ -23,3 +23,6 @@ api.add_resource(Example, "/example")
 
 from endpoints.auth import Auth
 api.add_resource(Auth, "/auth")
+
+from endpoints.auth import CreateUser
+api.add_resource(CreateUser, "/join")

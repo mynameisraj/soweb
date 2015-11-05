@@ -28,3 +28,41 @@ class Auth(Resource):
             return {"error": "unable to authenticate"}
 
         return {"sessionToken": response["sessionToken"]}
+
+class CreateUser(Resource):
+    def post(self):
+        """
+        they post us username/password
+        we send that to parse
+        which creates the user and gives us a session token
+        return the sessiontoken
+        """
+        parser = reqparse.RequestParser()
+        parser.add_argument("username", required=True)
+        parser.add_argument("password", required=True)
+        parser.add_argument("email")
+        args = parser.parse_args()
+        #extract require username/password
+
+        headers = {"X-Parse-Application-Id": app_id,
+                   "X-Parse-REST-API-Key": api_key,
+                   "X-Parse-Revocable-Session": 1}
+        payload = {"username": args["username"],
+                   "password": args["password"]}
+        print json.dumps(headers)
+        print json.dumps(payload)
+
+        if "email" in args:
+            payload["email"] = args["email"]
+            #email is optional
+
+        r = requests.post(url + "/users", headers = headers, json = payload)
+        #setup to send it the way parse wants
+        print r.text
+
+        response = json.loads(r.text)
+        print response
+        if "error" in response:
+            return {"error": "unable to create user"}
+
+        return {"sessionToken": response["sessionToken"]}
