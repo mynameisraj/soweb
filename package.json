@@ -1,0 +1,29 @@
+{
+  "name": "soweb",
+  "version": "1.0.0",
+  "description": "Web client for Shoutout",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mynameisraj/soweb.git"
+  },
+  "author": "Allen Kleiner, Raj Ramamurthy, Richard Lee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mynameisraj/soweb/issues"
+  },
+  "homepage": "https://github.com/mynameisraj/soweb",
+  "devDependencies": {
+    "bower": "^1.6.5",
+    "gulp": "^3.9.0",
+    "gulp-browserify": "^0.5.1",
+    "gulp-clean": "^0.3.1",
+    "gulp-sass": "^2.1.0",
+    "gulp-size": "^2.0.0",
+    "react": "^0.14.2",
+    "reactify": "^1.1.1"
+  }
+}
