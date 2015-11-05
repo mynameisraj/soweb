@@ -44,24 +44,23 @@ class CreateUser(Resource):
         args = parser.parse_args()
         #extract require username/password
 
+        #todo: add stuff for the geo location of the person, and display name
         headers = {"X-Parse-Application-Id": app_id,
                    "X-Parse-REST-API-Key": api_key,
                    "X-Parse-Revocable-Session": 1}
         payload = {"username": args["username"],
-                   "password": args["password"]}
-        print json.dumps(headers)
-        print json.dumps(payload)
+                   "password": args["password"],
+                   "displayName": args["username"]
+                   }
 
-        if "email" in args:
+        if args["email"] != None:
             payload["email"] = args["email"]
             #email is optional
 
         r = requests.post(url + "/users", headers = headers, json = payload)
         #setup to send it the way parse wants
-        print r.text
 
         response = json.loads(r.text)
-        print response
         if "error" in response:
             return {"error": "unable to create user"}
 
