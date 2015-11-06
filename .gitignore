@@ -3,3 +3,4 @@
 .DS_Store
 venv/
 node_modules/
+soweb/static/js/
