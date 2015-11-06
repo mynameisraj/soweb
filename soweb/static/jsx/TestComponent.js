@@ -12,8 +12,6 @@ var LoginComponent = React.createClass({
             username: this.refs.username.getDOMNode().value,
             password: this.refs.password.getDOMNode().value
         }
-        var s = this.state;
-        var that = this;
 
         $.ajax({
             url: "/auth",
@@ -21,13 +19,14 @@ var LoginComponent = React.createClass({
             data: data,
             dataType: "json",
             success: function (result) {
+                var s = this.state;
                 if ("error" in result) {
                     s.loggedInStatus = "Invalid credentials"
                 } else if ("sessionToken" in result) {
                     s.loggedInStatus = "Logged in as " + data.username
                 }
-                that.setState(s);
-            },
+                this.setState(s);
+            }.bind(this),
             error: function (xhr, ajaxOptions, thrownError) {
                 console.log(xhr, ajaxOptions, thrownError);
             }
