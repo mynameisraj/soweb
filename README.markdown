@@ -3,7 +3,7 @@
 CS 242 project
 
 ## Setup
-pip install -r requirements.txt
+    $ pip install -r requirements.txt
 
 if you pip install more things, generate the requirements file again with
 pip freeze > requirements.txt
@@ -23,4 +23,4 @@ Run :
 To compile everything before starting up the development server. 
 
 ## Running
-python run.py runserver
+    $ python run.py runserver
