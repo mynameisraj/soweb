@@ -18,9 +18,6 @@ def index():
     return render_template("index.html")
 
 #rest endpoints
-from endpoints.example import Example
-api.add_resource(Example, "/example")
-
 from endpoints.auth import Auth
 api.add_resource(Auth, "/auth")
 
@@ -28,7 +25,13 @@ from endpoints.auth import CreateUser
 api.add_resource(CreateUser, "/join")
 
 from endpoints.geo import UpdateLocation
-api.add_resource(UpdateLocation, "/update_location")
+api.add_resource(UpdateLocation, "/update/location")
 
 from endpoints.geo import GeoQuery
 api.add_resource(GeoQuery, "/find")
+
+from endpoints.user import UserStatus
+api.add_resource(UserStatus, "/update/status")
+
+from endpoints.user import UserOnlineStatus
+api.add_resource(UserOnlineStatus, "/update/online")

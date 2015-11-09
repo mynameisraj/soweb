@@ -1,6 +1,6 @@
 import requests, json
-from flask_restful import reqparse, abort, Resource
-from real_config import app_id, api_key, url
+from flask_restful import reqparse, Resource
+from real_config import url
 from common import apiHeader
 
 class Auth(Resource):
