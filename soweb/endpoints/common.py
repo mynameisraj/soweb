@@ -25,3 +25,20 @@ def whoAmI(sessionToken):
 
 def validateSessionToken(sessionToken):
     return whoAmI(sessionToken) != None
+
+def updateUser(sessionToken, data):
+    headers = sessionTokenHeader(sessionToken)
+
+    userObjectId = whoAmI(sessionToken)
+    if userObjectId == None:
+        #we don't use validateSessionToken
+        #to avoid a duplicated call
+        return {"error": "authentication error"}
+
+    r = requests.put(url + "/users/" + userObjectId,
+            headers = headers, json = data)
+    response = json.loads(r.text)
+
+    if "error" in response:
+        return {"error": "update failure"}
+    return {"success": "update success"}
