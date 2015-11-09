@@ -5,10 +5,14 @@ Common functions that will be useful for
 other parts of the code
 """
 
-def sessionTokenHeader(sessionToken):
+def apiHeader():
     return {"X-Parse-Application-Id": app_id,
-            "X-Parse-REST-API-Key": api_key,
-            "X-Parse-Session-Token": sessionToken}
+            "X-Parse-REST-API-Key": api_key}
+
+def sessionTokenHeader(sessionToken):
+    header = apiHeader()
+    header["X-Parse-Session-Token"] = sessionToken
+    return header
 
 def whoAmI(sessionToken):
     #returns object id for the user who owns this session
@@ -18,3 +22,6 @@ def whoAmI(sessionToken):
     if "objectId" in response:
         return response["objectId"]
     return None
+
+def validateSessionToken(sessionToken):
+    return whoAmI(sessionToken) != None
