@@ -26,3 +26,6 @@ api.add_resource(Auth, "/auth")
 
 from endpoints.auth import CreateUser
 api.add_resource(CreateUser, "/join")
+
+from endpoints.geo import UpdateLocation
+api.add_resource(UpdateLocation, "/update_location")
