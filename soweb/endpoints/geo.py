@@ -1,7 +1,6 @@
 import requests, json
 from flask_restful import reqparse, Resource
 from real_config import url
-
 from common import updateUser, validateSessionToken, apiHeader
 
 

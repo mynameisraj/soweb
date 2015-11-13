@@ -35,3 +35,6 @@ api.add_resource(UserStatus, "/update/status")
 
 from endpoints.user import UserOnlineStatus
 api.add_resource(UserOnlineStatus, "/update/online")
+
+from endpoints.user import UserProfilePicture
+api.add_resource(UserProfilePicture, "/profile_pic")
