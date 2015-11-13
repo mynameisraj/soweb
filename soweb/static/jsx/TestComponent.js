@@ -1,6 +1,7 @@
 /*** @jsx React.DOM */
 
-var SESSION_TOKEN; 
+var SESSION_TOKEN;
+var map;
 
 var SignupComponent = React.createClass({
     getInitialState: function() {
@@ -76,6 +77,50 @@ var LoginComponent = React.createClass({
                 } else if ("sessionToken" in result) {
                     s.loggedInStatus = "Logged in as " + data.username
                     SESSION_TOKEN = result.sessionToken;
+
+                    if (navigator.geolocation) { 
+                        navigator.geolocation.getCurrentPosition(geolocCallback);
+                    } else {
+                        console.log("Geolocation is not supported");
+                    }
+
+                    var that = this;
+
+                    function geolocCallback(position) { 
+                        lat = position.coords.latitude;
+                        lon = position.coords.longitude;
+
+                        var data = {
+                            sessionToken: SESSION_TOKEN,
+                            lat: lat, 
+                            lon: lon
+                        };
+
+                        if (SESSION_TOKEN !== null) {
+                            // trigger the map pan to the current view port
+                            // $("#map").trigger("pan")
+
+                            // find all of the relevant people for the current lat/long view.
+                            $.ajax({
+                                url: "/find",
+                                type: "POST",
+                                data: data,
+                                success: function(data) {
+                                    var results = data.results; 
+                                    for (var i = 0; i < results.length; i++) {
+                                        var cur = results[i];
+                                        var curLat = cur.geo.latitude;
+                                        var curLong = cur.geo.longitude;
+                                        L.marker([curLat, curLong]).addTo(map)
+                                            .bindPopup(cur.displayName);
+                                    }
+                                }, 
+                                error: function (xhr, ajaxOptions, thrownError) {
+                                    console.log(xhr, ajaxOptions, thrownError);
+                                }
+                            });
+                        }
+                    }
                 }
                 this.setState(s);
             }.bind(this),
@@ -114,57 +159,19 @@ var MapComponent = React.createClass({
     initializeMap: function() { 
         var cupertinoCoords = [37.311, -122.056]; //shoutout APPLE!
 
-        this.props.map = L.map(this.getDOMNode(), {
+        /*this.props.*/map = L.map(this.getDOMNode(), {
             center: cupertinoCoords,
             zoom: 13
         });
 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(this.props.map);
+        }).addTo(/*this.props.*/map);
 
     },
 
     componentDidMount: function() {
         this.initializeMap();
-        var lat, lon;
-
-        if (navigator.geolocation) { 
-            navigator.geolocation.getCurrentPosition(geolocCallback);
-        } else {
-            console.log("Geolocation is not supported");
-        }
-
-        var that = this;
-
-        function geolocCallback(position) { 
-            lat = position.coords.latitude;
-            lon = position.coords.longitude;
-
-            var data = {
-                sessionToken: SESSION_TOKEN,
-                lat: lat, 
-                lon: lon
-            };
-
-            if (SESSION_TOKEN !== null) {
-                // update the map view
-                that.props.map.panTo([lat, lon]);
-
-                // find all of the relevant people for the currnet lat/long view.
-                $.ajax({
-                    url: "/find",
-                    type: "POST",
-                    data: data,
-                    success: function(result) {
-                        console.log(result);
-                    }, 
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        console.log(xhr, ajaxOptions, thrownError);
-                    }
-                });
-            }
-        }
     },
 
     render: function() {
