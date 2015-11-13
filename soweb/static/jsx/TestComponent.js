@@ -114,14 +114,50 @@ var MapComponent = React.createClass({
     updateMapToLocation: function(position) {
         // Update all the markers on the map with new data
         var map = this.props.map;
+        var defaultIcon = L.icon({
+            iconUrl: "/default_profile_pic.jpg",
+            iconRetinaUrl: "/default_profile_pic.jpg",
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
+        });
         var drawPinsWithData = function(data) {
+            console.log(data);
             var results = data.results; 
+            var markers = {}
             for (var i = 0; i < results.length; i++) {
                 var cur = results[i];
-                var curLat = cur.geo.latitude;
-                var curLong = cur.geo.longitude;
-                L.marker([curLat, curLong]).addTo(map)
+                var curLat = cur.lat;
+                var curLong = cur.lon;
+                var marker = L.marker([curLat, curLong], {'icon': defaultIcon});
+                marker.addTo(map)
                     .bindPopup('<strong>' + cur.username + '</strong>: ' + cur.status);
+                var username = cur.username;
+                markers[username] = marker;
+                $.ajax({
+                    url: "/profile_pic",
+                    type: "POST",
+                    data: {
+                        "sessionToken": SESSION_TOKEN,
+                        "username": cur.username
+                    },
+                    success: function(data) {
+                        if ("url" in data) {
+                            var url = data.url;
+                            var newIcon = L.icon({
+                                iconUrl: url,
+                                iconRetinaUrl: url,
+                                iconSize: [40, 40],
+                                iconAnchor: [20, 20],
+                                popupAnchor: [0, -20]
+                            });
+                            markers[username].setIcon(newIcon);
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        console.log(xhr, ajaxOptions, thrownError);
+                    }
+                })
             }
         }
 
