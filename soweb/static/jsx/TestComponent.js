@@ -1,5 +1,7 @@
 /*** @jsx React.DOM */
 
+var SESSION_TOKEN; 
+
 var SignupComponent = React.createClass({
     getInitialState: function() {
         return {
@@ -25,6 +27,7 @@ var SignupComponent = React.createClass({
                     s.signupStatus = "Invalid credentials"
                 } else if ("sessionToken" in result) {
                     s.signupStatus = "Signed up as " + data.username
+                    SESSION_TOKEN = result.sessionToken;
                 }
                 this.setState(s);
             }.bind(this),
@@ -40,7 +43,7 @@ var SignupComponent = React.createClass({
                 Username: <input type="text" ref="username"/><br/>
                 Password: <input type="password" ref="password"/><br/>
                 Email: <input type="email" ref="email"/><br/>
-                <button onClick={this.signup}>Signup</button>
+                <button className="btn btn-primary" onClick={this.signup}>Signup</button>
                 <div>{this.state.signupStatus}</div>
             </div>
         );
@@ -50,7 +53,7 @@ var SignupComponent = React.createClass({
 var LoginComponent = React.createClass({
     getInitialState: function() {
         return {
-            loggedInStatus: "Not logged in"
+            loggedInStatus: "Not logged in",
         };
     },
     login: function(e) {
@@ -66,11 +69,13 @@ var LoginComponent = React.createClass({
             data: data,
             dataType: "json",
             success: function (result) {
+                console.log(result);
                 var s = this.state;
                 if ("error" in result) {
                     s.loggedInStatus = "Invalid credentials"
                 } else if ("sessionToken" in result) {
                     s.loggedInStatus = "Logged in as " + data.username
+                    SESSION_TOKEN = result.sessionToken;
                 }
                 this.setState(s);
             }.bind(this),
@@ -81,29 +86,109 @@ var LoginComponent = React.createClass({
     },
     render: function() {
         return (
-            <div class="login">
+            <div className="login">
                 <h3>Login to ShoutOut</h3>
                 Username: <input type="text" ref="username"/><br/>
                 Password: <input type="password" ref="password"/><br/>
-                <button onClick={this.login}>Login</button>
+                <button type="button" className="btn btn-default" onClick={this.login}>Login</button>
                 <div>{this.state.loggedInStatus}</div>
             </div>
         );
     }
 });
 
+var MapComponent = React.createClass({
+    getInitialState: function() {
+        return {
+            currentUser: null,
+            otherUsers: []
+        };
+    },
+
+    getDefaultProps: function() {
+        return {
+            map: null
+        };
+    },
+
+    initializeMap: function() { 
+        var cupertinoCoords = [37.311, -122.056]; //shoutout APPLE!
+
+        this.props.map = L.map(this.getDOMNode(), {
+            center: cupertinoCoords,
+            zoom: 13
+        });
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(this.props.map);
+
+    },
+
+    componentDidMount: function() {
+        this.initializeMap();
+        var lat, lon;
+
+        if (navigator.geolocation) { 
+            navigator.geolocation.getCurrentPosition(geolocCallback);
+        } else {
+            console.log("Geolocation is not supported");
+        }
+
+        var that = this;
+
+        function geolocCallback(position) { 
+            lat = position.coords.latitude;
+            lon = position.coords.longitude;
+
+            var data = {
+                sessionToken: SESSION_TOKEN,
+                lat: lat, 
+                lon: lon
+            };
+
+            if (SESSION_TOKEN !== null) {
+                // update the map view
+                that.props.map.panTo([lat, lon]);
+
+                // find all of the relevant people for the currnet lat/long view.
+                $.ajax({
+                    url: "/find",
+                    type: "POST",
+                    data: data,
+                    success: function(result) {
+                        console.log(result);
+                    }, 
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr, ajaxOptions, thrownError);
+                    }
+                });
+            }
+        }
+    },
+
+    render: function() {
+        return (
+            <div id="map"> 
+            </div>
+        )
+    }
+});
+
 var TestComponent = React.createClass({ 
     render: function() { 
         return (
-            <div class="shoutout-app">
-                <h2>Hello, World!</h2>
-                <p>This is ShoutOut for web. Shoutout SHOUTOUT!</p>
+            <div className="shoutout-app">
+                <h2>Shoutout for Web</h2>
+                <p> This is the web view for Shoutout. Shoutout SHOUTOUT!</p>
                 <LoginComponent/>
                 <SignupComponent/>
+                <MapComponent/>
             </div>
         );
     }
 });
+
 
 React.render(
     <TestComponent/>,

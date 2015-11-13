@@ -32,3 +32,5 @@ gulp.task("clean", function() {
 gulp.task("default", ["transform"], function() {
     console.log("Default task started");
 });
+
+gulp.watch(JSX_SRC, ["transform"]);
