@@ -56,5 +56,28 @@ class GeoQuery(Resource):
         header = apiHeader()
         r = requests.get(url + "/users", headers = header, params = data)
         response = json.loads(r.text)
-        #WARNING: this returns ALL user information including things like email
-        return response
+
+        #filter the response so we don't leak a bunch of personal info
+        filtered_response = {"results": []}
+        for item in response["results"]:
+            entry = {}
+            entry["username"] = item["username"]
+            if "displayName" not in item or item["displayName"] == None:
+                entry["displayName"] = item["username"]
+            else:
+                entry["displayName"] = item["displayName"]
+
+            if "status" not in item or item["status"] == None:
+                entry["status"] = ""
+            else:
+                entry["status"] = item["status"]
+
+            if "geo" not in item:
+                entry["lat"] = 0
+                entry["lon"] = 0
+            else:
+                entry["lat"] = item["geo"]["latitude"]
+                entry["lon"] = item["geo"]["longitude"]
+
+            filtered_response["results"].append(entry)
+        return filtered_response
