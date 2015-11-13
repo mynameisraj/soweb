@@ -125,8 +125,7 @@ var MapComponent = React.createClass({
             console.log(data);
             var results = data.results; 
             var markers = {}
-            for (var i = 0; i < results.length; i++) {
-                var cur = results[i];
+            $.each(results, function(index, cur) {
                 var curLat = cur.lat;
                 var curLong = cur.lon;
                 var marker = L.marker([curLat, curLong], {'icon': defaultIcon});
@@ -142,6 +141,7 @@ var MapComponent = React.createClass({
                         "username": cur.username
                     },
                     success: function(data) {
+                        console.log(data);
                         if ("url" in data) {
                             var url = data.url;
                             var newIcon = L.icon({
@@ -157,8 +157,8 @@ var MapComponent = React.createClass({
                     error: function(xhr, ajaxOptions, thrownError) {
                         console.log(xhr, ajaxOptions, thrownError);
                     }
-                })
-            }
+                });
+            });
         }
 
         lat = position.coords.latitude;
@@ -179,7 +179,6 @@ var MapComponent = React.createClass({
                 type: "POST",
                 data: data,
                 success: function(data) {
-                    console.log(data);
                     drawPinsWithData(data);
                 }, 
                 error: function (xhr, ajaxOptions, thrownError) {
