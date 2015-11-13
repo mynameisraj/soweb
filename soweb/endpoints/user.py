@@ -45,8 +45,7 @@ class UserProfilePicture(Resource):
             return {"error": "authentication problem"}
 
         userEntry = self.getEntryForUsername(args["username"])
-        default_pic = "http://files.parsetfss.com/c5fd1990-98a1-4d6d-8bd8-d66e4c413d88/tfss-b0fe026f-5f32-4e36-8688-31df088fe36f-Random-profiles-72.png"
-        #must change this later
+        default_pic = "/default_profile_pic.jpg"
 
         if "error" in userEntry:
             return {"error": "problem finding user"}

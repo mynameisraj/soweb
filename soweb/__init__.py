@@ -13,6 +13,11 @@ def favicon():
     return send_from_directory(
             os.path.join(app.root_path, 'static/img'),'favicon.ico')
 
+@app.route("/default_profile_pic.jpg")
+def default_profile_pic():
+    return send_from_directory(
+            os.path.join(app.root_path, 'static/img'),'anon.jpg')
+
 @app.route("/")
 def index():
     return render_template("index.html")
