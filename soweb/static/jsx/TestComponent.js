@@ -77,50 +77,7 @@ var LoginComponent = React.createClass({
                 } else if ("sessionToken" in result) {
                     s.loggedInStatus = "Logged in as " + data.username
                     SESSION_TOKEN = result.sessionToken;
-
-                    if (navigator.geolocation) { 
-                        navigator.geolocation.getCurrentPosition(geolocCallback);
-                    } else {
-                        console.log("Geolocation is not supported");
-                    }
-
-                    var that = this;
-
-                    function geolocCallback(position) { 
-                        lat = position.coords.latitude;
-                        lon = position.coords.longitude;
-
-                        var data = {
-                            sessionToken: SESSION_TOKEN,
-                            lat: lat, 
-                            lon: lon
-                        };
-
-                        if (SESSION_TOKEN !== null) {
-                            // trigger the map pan to the current view port
-                            // $("#map").trigger("pan")
-
-                            // find all of the relevant people for the current lat/long view.
-                            $.ajax({
-                                url: "/find",
-                                type: "POST",
-                                data: data,
-                                success: function(data) {
-                                    var results = data.results; 
-                                    for (var i = 0; i < results.length; i++) {
-                                        var cur = results[i];
-                                        var curLat = cur.geo.latitude;
-                                        var curLong = cur.geo.longitude;
-                                        L.marker([curLat, curLong]).addTo(map)
-                                            .bindPopup(cur.displayName);
-                                    }
-                                }, 
-                                error: function (xhr, ajaxOptions, thrownError) {
-                                    console.log(xhr, ajaxOptions, thrownError);
-                                }
-                            });
-                        }
-                    }
+                    this.props.postLogin();
                 }
                 this.setState(s);
             }.bind(this),
@@ -149,31 +106,71 @@ var MapComponent = React.createClass({
             otherUsers: []
         };
     },
-
     getDefaultProps: function() {
         return {
             map: null
         };
     },
+    updateMapToLocation: function(position) {
+        // Update all the markers on the map with new data
+        var map = this.props.map;
+        var drawPinsWithData = function(data) {
+            var results = data.results; 
+            for (var i = 0; i < results.length; i++) {
+                var cur = results[i];
+                var curLat = cur.geo.latitude;
+                var curLong = cur.geo.longitude;
+                L.marker([curLat, curLong]).addTo(map)
+                    .bindPopup('<strong>' + cur.username + '</strong>: ' + cur.status);
+            }
+        }
 
+        lat = position.coords.latitude;
+        lon = position.coords.longitude;
+
+        map.setView(L.latLng(lat, lon));
+
+        var data = {
+            sessionToken: SESSION_TOKEN,
+            lat: lat, 
+            lon: lon
+        };
+
+        if (SESSION_TOKEN !== null) {
+            // find all of the relevant people for the current lat/long view.
+            $.ajax({
+                url: "/find",
+                type: "POST",
+                data: data,
+                success: function(data) {
+                    console.log(data);
+                    drawPinsWithData(data);
+                }, 
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(xhr, ajaxOptions, thrownError);
+                }
+            });
+        }
+    },
     initializeMap: function() { 
         var cupertinoCoords = [37.311, -122.056]; //shoutout APPLE!
-
-        /*this.props.*/map = L.map(this.getDOMNode(), {
+        var map = L.map(this.getDOMNode(), {
             center: cupertinoCoords,
             zoom: 13
         });
 
+        // TODO: prettier maps, add subdomains for parallel fetching
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(/*this.props.*/map);
+        }).addTo(map);
 
+        // Update props with the new map
+        this.props.map = map;
     },
-
+    // Initalize the map once we have a DOM node
     componentDidMount: function() {
         this.initializeMap();
     },
-
     render: function() {
         return (
             <div id="map"> 
@@ -183,14 +180,24 @@ var MapComponent = React.createClass({
 });
 
 var TestComponent = React.createClass({ 
+    userLoggedIn: function() {
+        if (navigator.geolocation) { 
+            navigator.geolocation.getCurrentPosition(geolocCallback);
+        } else {
+            console.log("Geolocation is not supported");
+        }
+
+        var map = this.refs.mapComponent;
+
+        function geolocCallback(position) { 
+            map.updateMapToLocation(position);
+        }
+    },
     render: function() { 
         return (
             <div className="shoutout-app">
-                <h2>Shoutout for Web</h2>
-                <p> This is the web view for Shoutout. Shoutout SHOUTOUT!</p>
-                <LoginComponent/>
-                <SignupComponent/>
-                <MapComponent/>
+                <MapComponent ref="mapComponent"/>
+                <LoginComponent postLogin={this.userLoggedIn} />
             </div>
         );
     }

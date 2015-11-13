@@ -1,4 +1,5 @@
 "use strict";
+process.env.NODE_ENV= "development";
 
 var gulp = require("gulp"),
     browserify = require("gulp-browserify"),
