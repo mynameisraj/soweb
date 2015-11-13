@@ -36,3 +36,8 @@ For the following endpoints, a sessionToken is required
         * onlineStatus must be a boolean value
         * success:  {"success": "success message"}
         * failure: {"error": "some kind of error message"}
+        
+## /profile_pic
+    * POST: {"sessionToken": sessionToken, "username": username}
+        * success: {"url": url to the profile picture}
+        * failure: {"error": "some kind of error message"}
