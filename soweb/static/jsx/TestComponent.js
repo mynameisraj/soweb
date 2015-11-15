@@ -175,7 +175,7 @@ var MapComponent = React.createClass({
         lat = position.coords.latitude;
         lon = position.coords.longitude;
 
-        map.setView(L.latLng(lat, lon));
+        map.setView(L.latLng(lat, lon), 20);
 
         var data = {
             sessionToken: SESSION_TOKEN,
