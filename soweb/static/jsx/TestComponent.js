@@ -3,6 +3,9 @@
 var SESSION_TOKEN;
 var map;
 
+/** 
+ * Allows a user to sign up, and adds them to the backend.
+ */ 
 var SignupComponent = React.createClass({
     getInitialState: function() {
         return {
@@ -51,6 +54,9 @@ var SignupComponent = React.createClass({
     }
 });
 
+/**
+ * Our login component which handles logging in the user. 
+ */
 var LoginComponent = React.createClass({
     getInitialState: function() {
         return {
@@ -99,6 +105,10 @@ var LoginComponent = React.createClass({
     }
 });
 
+/*
+ * Represents our map. Contains all user annotations 
+ * callouts representing their status and username.
+ */ 
 var MapComponent = React.createClass({
     getInitialState: function() {
         return {
@@ -121,6 +131,7 @@ var MapComponent = React.createClass({
             iconAnchor: [20, 20],
             popupAnchor: [0, -20]
         });
+
         var drawPinsWithData = function(data) {
             console.log(data);
             var results = data.results; 
@@ -169,7 +180,8 @@ var MapComponent = React.createClass({
         var data = {
             sessionToken: SESSION_TOKEN,
             lat: lat, 
-            lon: lon
+            lon: lon,
+            limit: 20
         };
 
         if (SESSION_TOKEN !== null) {
@@ -194,9 +206,11 @@ var MapComponent = React.createClass({
             zoom: 13
         });
 
-        // TODO: prettier maps, add subdomains for parallel fetching
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        L.tileLayer('https://{s}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}.png?access_token={token}', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            subdomains: ['a', 'b', 'c', 'd'],
+            token: 'pk.eyJ1IjoiYWtsZWluZXIyNCIsImEiOiJjaWd3cDNwNnQwc2U5d3dtMHQ1MTUzNGc0In0.DT4ef66V1VAdbYMhQbyc5A',
+            mapId: 'akleiner24.cigwp3o080scc4pm35hb1abwb'
         }).addTo(map);
 
         // Update props with the new map
@@ -214,7 +228,7 @@ var MapComponent = React.createClass({
     }
 });
 
-var TestComponent = React.createClass({ 
+var ShoutOut = React.createClass({ 
     userLoggedIn: function() {
         if (navigator.geolocation) { 
             navigator.geolocation.getCurrentPosition(geolocCallback);
@@ -240,6 +254,6 @@ var TestComponent = React.createClass({
 
 
 React.render(
-    <TestComponent/>,
+    <ShoutOut/>,
     document.getElementById("container")
 );
