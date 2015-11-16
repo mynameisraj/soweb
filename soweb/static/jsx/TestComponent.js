@@ -63,6 +63,17 @@ var LoginComponent = React.createClass({
             loggedInStatus: "Not logged in",
         };
     },
+
+    handleKeyPress: function(e) {
+        var key = e.which || e.keyCode; 
+        if (key === 13) {
+            var login = this.refs.btn.getDOMNode();
+            login.click();
+            this.refs.username.getDOMNode().value = ""; 
+            this.refs.password.getDOMNode().value = "";
+        }
+    },
+
     login: function(e) {
         e.preventDefault();
         var data = {
@@ -94,11 +105,11 @@ var LoginComponent = React.createClass({
     },
     render: function() {
         return (
-            <div className="login">
+            <div className="login" onKeyPress={this.handleKeyPress}>
                 <h3>Login to ShoutOut</h3>
                 Username: <input type="text" ref="username"/><br/>
                 Password: <input type="password" ref="password"/><br/>
-                <button type="button" className="btn btn-default" onClick={this.login}>Login</button>
+                <button type="button" className="btn btn-default" onClick={this.login} id="login-btn" ref="btn">Login</button>
                 <div>{this.state.loggedInStatus}</div>
             </div>
         );
