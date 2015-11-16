@@ -87,7 +87,6 @@ var LoginComponent = React.createClass({
             data: data,
             dataType: "json",
             success: function (result) {
-                console.log(result);
                 var s = this.state;
                 if ("error" in result) {
                     s.loggedInStatus = "Invalid credentials"
@@ -144,7 +143,6 @@ var MapComponent = React.createClass({
         });
 
         var drawPinsWithData = function(data) {
-            console.log(data);
             var results = data.results; 
             var markers = {}
             $.each(results, function(index, cur) {
@@ -163,7 +161,6 @@ var MapComponent = React.createClass({
                         "username": cur.username
                     },
                     success: function(data) {
-                        console.log(data);
                         if ("url" in data) {
                             var url = data.url;
                             var newIcon = L.icon({
