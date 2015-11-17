@@ -42,3 +42,14 @@ def updateUser(sessionToken, data):
     if "error" in response:
         return {"error": "update failure"}
     return {"success": "update success"}
+
+def getUserObjectId(username):
+    query = {"username":username}
+    data = {"where":json.dumps(query)}
+    header = apiHeader()
+    r = requests.get(url + "/users", headers = header, params = data)
+    response = json.loads(r.text)
+    if response["results"] == []:
+        return None
+    else:
+        return response["results"][0]["objectId"]
