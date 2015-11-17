@@ -43,3 +43,6 @@ api.add_resource(UserOnlineStatus, "/update/online")
 
 from endpoints.user import UserProfilePicture
 api.add_resource(UserProfilePicture, "/profile_pic")
+
+from endpoints.user import  MyMessages
+api.add_resource(MyMessages, "/msgs")

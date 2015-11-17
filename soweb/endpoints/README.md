@@ -41,3 +41,8 @@ For the following endpoints, a sessionToken is required
     * POST: {"sessionToken": sessionToken, "username": username}
         * success: {"url": url to the profile picture}
         * failure: {"error": "some kind of error message"}
+
+## /msgs 
+    * POST: {"sessionToken": sessionToken}
+        * success: [{"msg": "some kind of status", "objectId": "the object id of the message in the db", "readStatus": bool}]
+        * failure: {"error": "some kind of error message"}

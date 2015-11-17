@@ -1,7 +1,7 @@
 import requests, json
 from flask_restful import reqparse, Resource
 from real_config import url
-from common import updateUser, apiHeader, validateSessionToken, whoAmI, getUserObjectId
+from common import updateUser, apiHeader, validateSessionToken, whoAmI, getUserObjectId, sessionTokenHeader
 
 class UserStatus(Resource):
     def extractUsernames(self, status):
@@ -102,3 +102,53 @@ class UserProfilePicture(Resource):
             return {"url": userEntry["profileImage"]["image"]["url"]}
         else:
             return {"url": default_pic}
+
+class MyMessages(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument("sessionToken", required=True)
+        args = parser.parse_args()
+
+        sessionToken = args["sessionToken"]
+
+        userObjectId = whoAmI(sessionToken)
+        if userObjectId == None:
+            #we don't use validateSessionToken
+            #to avoid a duplicated call
+            return {"error": "authentication error"}
+
+        #query for the statuses that mention me
+        header = apiHeader()
+        query = {"to":
+                    {
+                        "__type": "Pointer",
+                        "className": "_User",
+                        "objectId": userObjectId
+                    }
+                } #change this
+        data = {"where": json.dumps(query)}
+
+        r = requests.get(url + "/classes/Messages", headers = header, params = data)
+        response = json.loads(r.text)
+        return [{"msg": item["message"], "readStatus": item["read"], "objectId": item["objectId"]} for item in response["results"]]
+
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument("sessionToken", required=True)
+        parser.add_argument("objectId", required = True)
+        parser.add_argument("flag", required = True, type = bool)
+        args = parser.parse_args()
+
+        sessionToken = args["sessionToken"]
+
+        userObjectId = whoAmI(sessionToken)
+        if userObjectId == None:
+            #we don't use validateSessionToken
+            #to avoid a duplicated call
+            return {"error": "authentication error"}
+
+        header = sessionTokenHeader(sessionToken)
+        data = {"read": bool(args["flag"])}
+        r = requests.put(url + "/classes/Messages/" + args["objectId"], headers = header, params = data)
+        return {"success": "changed flag"}
