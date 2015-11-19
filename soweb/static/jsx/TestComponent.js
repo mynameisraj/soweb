@@ -104,7 +104,7 @@ var LoginComponent = React.createClass({
     },
     render: function() {
         return (
-            <div className="login" onKeyPress={this.handleKeyPress}>
+            <div className="login" onKeyPress={this.handleKeyPress} className="col-md-4">
                 <h3>Login to ShoutOut</h3>
                 Username: <input type="text" ref="username"/><br/>
                 Password: <input type="password" ref="password"/><br/>
@@ -273,7 +273,7 @@ var MessagesComponent = React.createClass({
         });
 
         return (
-            <div id="messages-container">
+            <div id="messages-container" className="col-md-8">
                 {messageNodes}
             </div> 
         )
@@ -302,8 +302,10 @@ var ShoutOut = React.createClass({
         return (
             <div className="shoutout-app">
                 <MapComponent ref="mapComponent"/>
-                <LoginComponent postLogin={this.userLoggedIn} />
-                <MessagesComponent ref="messagesComponent"/> 
+                <div className="row">
+                    <LoginComponent postLogin={this.userLoggedIn} />
+                    <MessagesComponent ref="messagesComponent"/> 
+                </div> 
             </div>
         );
     }
