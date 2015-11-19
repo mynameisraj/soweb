@@ -67,10 +67,7 @@ var LoginComponent = React.createClass({
     handleKeyPress: function(e) {
         var key = e.which || e.keyCode; 
         if (key === 13) {
-            var login = this.refs.btn.getDOMNode();
-            login.click();
-            this.refs.username.getDOMNode().value = ""; 
-            this.refs.password.getDOMNode().value = "";
+            this.login(e);
         }
     },
 
@@ -101,6 +98,9 @@ var LoginComponent = React.createClass({
                 console.log(xhr, ajaxOptions, thrownError);
             }
         });
+
+        this.refs.username.getDOMNode().value = ""; 
+        this.refs.password.getDOMNode().value = "";
     },
     render: function() {
         return (
@@ -253,7 +253,7 @@ var MessagesComponent = React.createClass({
             type: "POST",
             data: data,
             success: function(data) {
-                // trigger a re-render
+                // trigger a re-render  
                 this.setState({messages: data}); 
             }.bind(this), 
             error: function (xhr, ajaxOptions, thrownError) {
