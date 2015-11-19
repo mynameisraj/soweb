@@ -236,6 +236,50 @@ var MapComponent = React.createClass({
     }
 });
 
+var MessagesComponent = React.createClass({
+    getInitialState: function() { 
+        return { 
+            messages: []
+        }
+    },
+
+    getMessages: function() { 
+        var data = { 
+            sessionToken: SESSION_TOKEN
+        };
+
+        $.ajax({
+            url: "/msgs",
+            type: "POST",
+            data: data,
+            success: function(data) {
+                // trigger a re-render
+                this.setState({messages: data}); 
+            }.bind(this), 
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(xhr, ajaxOptions, thrownError);
+            }
+        }); 
+    },
+
+    render: function() { 
+        console.log(this.state.messages);
+        var messageNodes = this.state.messages.map(function(message) { 
+            return (
+                <div className="message"> 
+                    <em> {message.msg} </em> 
+                </div> 
+            )
+        });
+
+        return (
+            <div id="messages-container">
+                {messageNodes}
+            </div> 
+        )
+    }
+});
+
 var ShoutOut = React.createClass({ 
     userLoggedIn: function() {
         if (navigator.geolocation) { 
@@ -249,12 +293,17 @@ var ShoutOut = React.createClass({
         function geolocCallback(position) { 
             map.updateMapToLocation(position);
         }
+
+        var messages = this.refs.messagesComponent;
+
+        messages.getMessages(); 
     },
     render: function() { 
         return (
             <div className="shoutout-app">
                 <MapComponent ref="mapComponent"/>
                 <LoginComponent postLogin={this.userLoggedIn} />
+                <MessagesComponent ref="messagesComponent"/> 
             </div>
         );
     }
