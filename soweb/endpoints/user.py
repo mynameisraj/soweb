@@ -126,11 +126,12 @@ class MyMessages(Resource):
                         "objectId": userObjectId
                     }
                 } #change this
-        data = {"where": json.dumps(query)}
+        data = {"where": json.dumps(query), "include":"from"}
 
         r = requests.get(url + "/classes/Messages", headers = header, params = data)
         response = json.loads(r.text)
-        return [{"msg": item["message"], "readStatus": item["read"], "objectId": item["objectId"]} for item in response["results"]]
+        return [{"msg": item["message"], "readStatus": item["read"], "objectId": item["objectId"],
+            "from": item["from"]["username"]} for item in response["results"]]
 
 
     def put(self):
