@@ -1,10 +1,4 @@
 #map {
-    margin: 50px 0 0;
+    margin: 20px 0 0;
     height: 500px;
-}
-
-
-#messages-container { 
-    height: 500px;
-    overflow: scroll;
 }

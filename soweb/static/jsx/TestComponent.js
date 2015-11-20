@@ -238,7 +238,7 @@ var MapComponent = React.createClass({
     },
     render: function() {
         return (
-            <div id="map"> 
+            <div id="map" className="col-md-12"> 
             </div>
         )
     }
@@ -247,7 +247,8 @@ var MapComponent = React.createClass({
 var MessagesComponent = React.createClass({
     getInitialState: function() { 
         return { 
-            messages: []
+            messages: [],
+            messagesWidth: "hidden"
         }
     },
 
@@ -270,20 +271,35 @@ var MessagesComponent = React.createClass({
         }); 
     },
 
+    goFullWidth: function() {
+        var s = this.state;
+        s.messagesWidth = "col-md-12";
+        this.setState(s);
+    },
+
     render: function() { 
         console.log(this.state.messages);
         var messageNodes = this.state.messages.map(function(message) { 
             return (
-                <div className="message"> 
-                    <em> {message.msg} </em> 
-                </div> 
+                <tr> 
+                    <td>{message.from}</td>
+                    <td>{message.msg}</td> 
+                </tr>
             )
         });
 
         return (
-            <div id="messages-container" className="col-md-8">
-                {messageNodes}
-            </div> 
+            <div id="messages-container" className={this.state.messagesWidth}>
+                <table className="message table"> 
+                    <thead>
+                        <th>From</th>
+                        <th>Message</th>
+                    </thead>
+                    <tbody>
+                        {messageNodes}
+                    </tbody>
+                </table> 
+            </div>
         )
     }
 });
@@ -297,21 +313,24 @@ var ShoutOut = React.createClass({
         }
 
         var map = this.refs.mapComponent;
-
         function geolocCallback(position) { 
             map.updateMapToLocation(position);
         }
 
         var messages = this.refs.messagesComponent;
-
         messages.getMessages(); 
+
+        $(this.refs.loginComponent.getDOMNode()).hide();
+        this.refs.messagesComponent.goFullWidth();
     },
     render: function() { 
         return (
             <div className="shoutout-app">
-                <MapComponent ref="mapComponent"/>
                 <div className="row">
-                    <LoginComponent postLogin={this.userLoggedIn} />
+                    <MapComponent ref="mapComponent"/>
+                </div>
+                <div className="row">
+                    <LoginComponent postLogin={this.userLoggedIn} ref="loginComponent" />
                     <MessagesComponent ref="messagesComponent"/> 
                 </div> 
             </div>
