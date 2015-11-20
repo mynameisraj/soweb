@@ -106,10 +106,18 @@ var LoginComponent = React.createClass({
         return (
             <div className="login" onKeyPress={this.handleKeyPress} className="col-md-4">
                 <h3>Login to ShoutOut</h3>
-                Username: <input type="text" ref="username"/><br/>
-                Password: <input type="password" ref="password"/><br/>
-                <button type="button" className="btn btn-default" onClick={this.login} id="login-btn" ref="btn">Login</button>
-                <div>{this.state.loggedInStatus}</div>
+                <h6>{this.state.loggedInStatus}</h6>
+                <form>
+                    <div className="form-group">
+                        <label for="inputEmail1">Username</label>
+                        <input type="text" className="form-control" id="inputEmail1" placeholder="Email" ref="username" />
+                    </div>
+                    <div className="form-group">
+                        <label for="inputPassword1">Password</label>
+                        <input type="password" className="form-control" id="inputPassword1" placeholder="Password" ref="password" />
+                    </div>
+                    <button type="submit" className="btn btn-default" onClick={this.login} id="login-btn" ref="btn">Login</button>
+                </form>
             </div>
         );
     }
