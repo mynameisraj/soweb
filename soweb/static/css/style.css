@@ -1,4 +1,9 @@
+.navbar {
+    border-bottom: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    margin-bottom: 0;
+}
+
 #map {
-    margin: 20px 0 0;
     height: 500px;
 }
