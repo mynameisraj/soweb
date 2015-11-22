@@ -7,20 +7,6 @@ var map;
  * Our navigation component which contains links to log in, sign out, etc. 
  */
 var NavComponent = React.createClass({
-    getInitialState: function() {
-        return {
-            'loggedIn': false,
-            'username': ''
-        }
-    },
-
-    setUsername: function(username) {
-        var s = this.state;
-        s.loggedIn = true;
-        s.username = username;
-        this.setState(s);
-    },
-
     render: function() {
         return (
             <nav className="navbar navbar-default navbar-static-top">
@@ -37,9 +23,9 @@ var NavComponent = React.createClass({
 
                 <div className="collapse navbar-collapse" id="so-navbar-collapse">
                   <ul className="nav navbar-nav navbar-right">
-                    <li className={this.state.loggedIn ? 'hidden' : ''}><a href="#" data-toggle="modal" data-target="#login-modal">Login</a></li>
-                    <li className="dropdown" className={this.state.loggedIn ? '' : 'hidden'}>
-                      <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Logged in as {this.state.username} <span className="caret"></span></a>
+                    <li className={this.props.username != '' ? 'hidden' : ''}><a href="#" data-toggle="modal" data-target="#login-modal">Login</a></li>
+                    <li className="dropdown" className={this.props.username == '' ? '' : 'hidden'}>
+                      <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Logged in as {this.props.username} <span className="caret"></span></a>
                       <ul className="dropdown-menu">
                         <li><a href="#">Action</a></li>
                         <li><a href="#">Another action</a></li>
@@ -379,6 +365,11 @@ var MessagesComponent = React.createClass({
 });
 
 var ShoutOut = React.createClass({ 
+    getInitialState: function() {
+        return {
+            'username': ''
+        }
+    },
     userLoggedIn: function(username) {
         if (navigator.geolocation) { 
             navigator.geolocation.getCurrentPosition(geolocCallback);
@@ -395,14 +386,16 @@ var ShoutOut = React.createClass({
         messages.getMessages(); 
         messages.goFullWidth();
 
-        this.refs.navComponent.setUsername(username);
+        var s = this.state;
+        s.username = username;
+        this.setState(s);
     },
     render: function() { 
         return (
             <div className="shoutout-app">
                 <LoginComponent postLogin={this.userLoggedIn} ref="loginComponent" />
                 <div className="nav" role="navigation">
-                    <NavComponent ref="navComponent" />
+                    <NavComponent username={this.state.username} ref="navComponent" />
                 </div>
                 <div className="container-fluid">
                     <div className="row">
