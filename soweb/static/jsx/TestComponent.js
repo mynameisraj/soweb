@@ -3,6 +3,59 @@
 var SESSION_TOKEN;
 var map;
 
+/**
+ * Our navigation component which contains links to log in, sign out, etc. 
+ */
+var NavComponent = React.createClass({
+    getInitialState: function() {
+        return {
+            'loggedIn': false,
+            'username': ''
+        }
+    },
+
+    setUsername: function(username) {
+        var s = this.state;
+        s.loggedIn = true;
+        s.username = username;
+        this.setState(s);
+    },
+
+    render: function() {
+        return (
+            <nav className="navbar navbar-default navbar-static-top">
+              <div className="container">
+                <div className="navbar-header">
+                  <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#so-navbar-collapse" aria-expanded="false">
+                    <span className="sr-only">Toggle navigation</span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                  </button>
+                  <a className="navbar-brand" href="#">ShoutOut</a>
+                </div>
+
+                <div className="collapse navbar-collapse" id="so-navbar-collapse">
+                  <ul className="nav navbar-nav navbar-right">
+                    <li className={this.state.loggedIn ? 'hidden' : ''}><a href="#" data-toggle="modal" data-target="#login-modal">Login</a></li>
+                    <li className="dropdown" className={this.state.loggedIn ? '' : 'hidden'}>
+                      <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Logged in as {this.state.username} <span className="caret"></span></a>
+                      <ul className="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" className="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
+       )
+    }
+});
+
 /** 
  * Allows a user to sign up, and adds them to the backend.
  */ 
@@ -42,7 +95,7 @@ var SignupComponent = React.createClass({
     },
     render: function() {
         return (
-            <div class="signup">
+            <div className="signup">
                 <h3>Signup for ShoutOut</h3>
                 Username: <input type="text" ref="username"/><br/>
                 Password: <input type="password" ref="password"/><br/>
@@ -73,10 +126,12 @@ var LoginComponent = React.createClass({
 
     login: function(e) {
         e.preventDefault();
+        $(this.refs.errorAlert).addClass("hidden");
         var data = {
             username: this.refs.username.getDOMNode().value,
             password: this.refs.password.getDOMNode().value
         }
+        $(this.refs.btn).html("Logging in...");
 
         $.ajax({
             url: "/auth",
@@ -86,11 +141,14 @@ var LoginComponent = React.createClass({
             success: function (result) {
                 var s = this.state;
                 if ("error" in result) {
-                    s.loggedInStatus = "Invalid credentials"
+                    s.loggedInStatus = "Invalid credentials";
+                    $(this.refs.errorAlert).removeClass("hidden");
+                    $(this.refs.btn).html("Login");
                 } else if ("sessionToken" in result) {
                     s.loggedInStatus = "Logged in as " + data.username
                     SESSION_TOKEN = result.sessionToken;
-                    this.props.postLogin();
+                    $('#login-modal').modal('toggle')
+                    this.props.postLogin(data.username);
                 }
                 this.setState(s);
             }.bind(this),
@@ -104,20 +162,36 @@ var LoginComponent = React.createClass({
     },
     render: function() {
         return (
-            <div className="login" onKeyPress={this.handleKeyPress} className="col-md-4">
-                <h3>Login to ShoutOut</h3>
-                <h6>{this.state.loggedInStatus}</h6>
-                <form>
-                    <div className="form-group">
-                        <label for="inputEmail1">Username</label>
-                        <input type="text" className="form-control" id="inputEmail1" placeholder="Email" ref="username" />
+            <div className="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
+              <div className="modal-dialog" role="document">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 className="modal-title" id="loginModalLabel">Login to ShoutOut</h4>
+                  </div>
+                  <div className="modal-body">
+                    <div className="alert alert-danger hidden" role="alert" ref="errorAlert">{this.state.loggedInStatus}</div>
+                    <div className="login" onKeyPress={this.handleKeyPress}>
+                        <form>
+                            <div className="form-group">
+                                <label for="inputEmail1">Username</label>
+                                <input type="text" className="form-control" id="inputEmail1" placeholder="Email" ref="username" />
+                            </div>
+                            <div className="form-group">
+                                <label for="inputPassword1">Password</label>
+                                <input type="password" className="form-control" id="inputPassword1" placeholder="Password" ref="password" />
+                            </div>
+                        </form>
                     </div>
-                    <div className="form-group">
-                        <label for="inputPassword1">Password</label>
-                        <input type="password" className="form-control" id="inputPassword1" placeholder="Password" ref="password" />
-                    </div>
-                    <button type="submit" className="btn btn-default" onClick={this.login} id="login-btn" ref="btn">Login</button>
-                </form>
+                  </div>
+                  <div className="modal-footer">
+                      <form>
+                          <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="submit" className="btn btn-primary" onClick={this.login} id="login-btn" ref="btn">Login</button>
+                      </form>
+                  </div>
+                </div>
+              </div>
             </div>
         );
     }
@@ -252,6 +326,12 @@ var MessagesComponent = React.createClass({
         }
     },
 
+    goFullWidth: function() {
+        var s = this.state;
+        s.messagesWidth = "col-md-12";
+        this.setState(s);
+    },
+
     getMessages: function() { 
         var data = { 
             sessionToken: SESSION_TOKEN
@@ -269,12 +349,6 @@ var MessagesComponent = React.createClass({
                 console.log(xhr, ajaxOptions, thrownError);
             }
         }); 
-    },
-
-    goFullWidth: function() {
-        var s = this.state;
-        s.messagesWidth = "col-md-12";
-        this.setState(s);
     },
 
     render: function() { 
@@ -305,7 +379,7 @@ var MessagesComponent = React.createClass({
 });
 
 var ShoutOut = React.createClass({ 
-    userLoggedIn: function() {
+    userLoggedIn: function(username) {
         if (navigator.geolocation) { 
             navigator.geolocation.getCurrentPosition(geolocCallback);
         } else {
@@ -319,20 +393,25 @@ var ShoutOut = React.createClass({
 
         var messages = this.refs.messagesComponent;
         messages.getMessages(); 
+        messages.goFullWidth();
 
-        $(this.refs.loginComponent.getDOMNode()).hide();
-        this.refs.messagesComponent.goFullWidth();
+        this.refs.navComponent.setUsername(username);
     },
     render: function() { 
         return (
             <div className="shoutout-app">
-                <div className="row">
-                    <MapComponent ref="mapComponent"/>
+                <LoginComponent postLogin={this.userLoggedIn} ref="loginComponent" />
+                <div className="nav" role="navigation">
+                    <NavComponent ref="navComponent" />
                 </div>
-                <div className="row">
-                    <LoginComponent postLogin={this.userLoggedIn} ref="loginComponent" />
-                    <MessagesComponent ref="messagesComponent"/> 
-                </div> 
+                <div className="container-fluid">
+                    <div className="row">
+                        <MapComponent ref="mapComponent"/>
+                    </div>
+                    <div className="row">
+                        <MessagesComponent ref="messagesComponent"/> 
+                    </div> 
+                </div>
             </div>
         );
     }
