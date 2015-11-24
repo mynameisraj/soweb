@@ -194,14 +194,11 @@ var MapComponent = React.createClass({
             otherUsers: []
         };
     },
-    getDefaultProps: function() {
-        return {
-            map: null
-        };
-    },
+    
     updateMapToLocation: function(position) {
         // Update all the markers on the map with new data
         var map = this.props.map;
+        console.log(this.props);
         var defaultIcon = L.icon({
             iconUrl: "/default_profile_pic.jpg",
             iconRetinaUrl: "/default_profile_pic.jpg",
@@ -290,12 +287,9 @@ var MapComponent = React.createClass({
         }).addTo(map);
 
         // Update props with the new map
-        this.props.map = map;
+        return map; 
     },
-    // Initalize the map once we have a DOM node
-    componentDidMount: function() {
-        this.initializeMap();
-    },
+
     render: function() {
         return (
             <div id="map" className="col-md-12"> 
@@ -338,7 +332,6 @@ var MessagesComponent = React.createClass({
     },
 
     render: function() { 
-        console.log(this.state.messages);
         var messageNodes = this.state.messages.map(function(message) { 
             return (
                 <tr> 
@@ -370,6 +363,20 @@ var ShoutOut = React.createClass({
             'username': ''
         }
     },
+
+    getDefaultProps: function() { 
+        return { 
+            map: null
+        }
+    },
+
+    componentDidMount: function() { 
+        var map = this.refs.mapComponent;
+        var mapObj = map.initializeMap();
+
+        this.props.map = mapObj; 
+    },
+
     userLoggedIn: function(username) {
         if (navigator.geolocation) { 
             navigator.geolocation.getCurrentPosition(geolocCallback);
@@ -378,7 +385,9 @@ var ShoutOut = React.createClass({
         }
 
         var map = this.refs.mapComponent;
+
         function geolocCallback(position) { 
+            console.log("We hit the Geolocation callback!");
             map.updateMapToLocation(position);
         }
 
@@ -399,7 +408,7 @@ var ShoutOut = React.createClass({
                 </div>
                 <div className="container-fluid">
                     <div className="row">
-                        <MapComponent ref="mapComponent"/>
+                        <MapComponent ref="mapComponent" map={this.props.map}/>
                     </div>
                     <div className="row">
                         <MessagesComponent ref="messagesComponent"/> 
