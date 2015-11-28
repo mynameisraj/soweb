@@ -198,7 +198,7 @@ var MapComponent = React.createClass({
     updateMapToLocation: function(position) {
         // Update all the markers on the map with new data
         var map = this.props.map;
-        console.log(this.props);
+
         var defaultIcon = L.icon({
             iconUrl: "/default_profile_pic.jpg",
             iconRetinaUrl: "/default_profile_pic.jpg",
@@ -249,6 +249,14 @@ var MapComponent = React.createClass({
         lon = position.coords.longitude;
 
         map.setView(L.latLng(lat, lon), 20);
+
+        $.ajax({
+            url: "/update/location",
+            type: "PUT",
+            sessionToken: SESSION_TOKEN,
+            lat: lat, 
+            lon: lon
+        });
 
         var data = {
             sessionToken: SESSION_TOKEN,
