@@ -1,7 +1,6 @@
 /*** @jsx React.DOM */
 
 var SESSION_TOKEN;
-var map;
 
 /**
  * Our navigation component which contains links to log in, sign out, etc. 
