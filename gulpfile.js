@@ -2,10 +2,13 @@
 process.env.NODE_ENV= "development";
 
 var gulp = require("gulp"),
-    browserify = require("gulp-browserify"),
+    browserify = require("browserify"),
+    source = require("vinyl-source-stream"),
     size = require("gulp-size"),
     clean = require("gulp-clean"),
-    sass = require("gulp-sass");
+    sass = require("gulp-sass"),
+    reactify = require("reactify");
+
 
 // File constants. 
 var STATIC = "./soweb/static/"
@@ -18,20 +21,19 @@ var JSX_DEST = STATIC + "jsx/",
     JS_DEST = STATIC + "js/",
     CSS_DEST = STATIC + "css/";
 
-gulp.task("transform", ["clean"], function() { 
-    return gulp.src(JSX_SRC)
-        .pipe(browserify({transform: ['reactify']}))
+var APP = STATIC + "js/app.js"; 
+
+gulp.task("transform", function() { 
+    return browserify(APP)
+        .transform(reactify)
+        .bundle()
+        .pipe(source("bundle.js"))
         .pipe(gulp.dest(JS_DEST))
         .pipe(size());
-});
-
-gulp.task("clean", function() {
-    return gulp.src(JS_DEST)
-        .pipe(clean())
 });
 
 gulp.task("default", ["transform"], function() {
     console.log("Default task started");
 });
 
-gulp.watch(JSX_SRC, ["transform"]);
+gulp.watch([APP, STATIC + "js/components/*.jsx"], ["transform"]);
