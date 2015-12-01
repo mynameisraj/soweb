@@ -6,6 +6,7 @@ CS 242 project
     $ pip install -r requirements.txt
 
 If you pip install more things, generate the requirements file again with:
+
     $ pip freeze > requirements.txt
 
 Also make sure you run: 
@@ -26,8 +27,10 @@ Run :
 
     $ gulp
 
-To compile everything before starting up the development server. 
+To compile everything before starting up the development server. Gulp will then watch for any changes in JavaScript files.  
 
 
 ## Running
+Once you run the `gulp` command - open up another terminal, navigate to the project, and then run:
+
     $ python run.py runserver
