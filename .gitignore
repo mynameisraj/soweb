@@ -3,5 +3,5 @@
 .DS_Store
 venv/
 node_modules/
-soweb/static/js/
+soweb/static/js/bundle.js
 soweb/endpoints/real_config.py
