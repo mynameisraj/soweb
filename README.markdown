@@ -12,7 +12,6 @@ If you pip install more things, generate the requirements file again with:
 Also make sure you run: 
 
     $ npm install 
-    $ bower install 
 
 To make sure that you install the client-side dependencies. 
 
